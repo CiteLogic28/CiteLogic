@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLMO Kit — 2Create Designs | CiteLogic</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* ── Gate overlay ─────────────────────────────────────────────── */
+    #gate {
+      position: fixed; inset: 0; background: #0f172a;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    #gate.hidden { display: none; }
+    .gate-card {
+      background: #1e293b; border-radius: 12px; padding: 2.5rem;
+      width: 100%; max-width: 400px; text-align: center;
+    }
+    .gate-logo { font-size: 1.1rem; font-weight: 700; color: #f1f5f9;
+      letter-spacing: 0.05em; margin-bottom: 1.5rem; }
+    .gate-logo span { color: #6366f1; }
+    .gate-card h2 { font-size: 1.1rem; color: #f1f5f9; margin-bottom: 0.5rem; }
+    .gate-card p { font-size: 0.875rem; color: #94a3b8; margin-bottom: 1.5rem; }
+    .gate-input {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 8px;
+      border: 1px solid #334155; background: #0f172a; color: #f1f5f9;
+      font-size: 1rem; letter-spacing: 0.1em; text-align: center;
+      margin-bottom: 1rem;
+    }
+    .gate-input:focus { outline: none; border-color: #6366f1; }
+    .gate-btn {
+      width: 100%; padding: 0.75rem; border-radius: 8px;
+      background: #6366f1; color: white; font-size: 0.9rem;
+      font-weight: 600; border: none; cursor: pointer;
+    }
+    .gate-btn:hover { background: #4f46e5; }
+    .gate-error { color: #f87171; font-size: 0.8rem; margin-top: 0.75rem; display: none; }
+
+    /* ── Layout ────────────────────────────────────────────────────── */
+    header {
+      background: #0f172a; color: white; padding: 1rem 2rem;
+      display: flex; align-items: center; gap: 1rem;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 1rem; font-weight: 700; letter-spacing: 0.05em; }
+    .logo span { color: #6366f1; }
+    header h1 { font-size: 1rem; font-weight: 400; color: #94a3b8; margin-left: auto; }
+
+    main { max-width: 860px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+
+    .hero {
+      background: white; border-radius: 12px; padding: 2rem;
+      border: 1px solid #e2e8f0; margin-bottom: 2rem;
+    }
+    .hero-eyebrow { font-size: 0.75rem; font-weight: 600; color: #6366f1;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .hero h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem; }
+    .hero p { color: #475569; font-size: 0.95rem; }
+
+    .status-row {
+      display: flex; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap;
+    }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.75rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    section { margin-bottom: 2rem; }
+    .section-title {
+      font-size: 0.8rem; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Code blocks ───────────────────────────────────────────────── */
+    .code-block {
+      background: white; border: 1px solid #e2e8f0;
+      border-radius: 10px; margin-bottom: 1rem; overflow: hidden;
+    }
+    .code-header {
+      background: #f8fafc; padding: 0.6rem 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .badge {
+      background: #ede9fe; color: #6d28d9;
+      padding: 0.15rem 0.6rem; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700;
+    }
+    .code-label { font-size: 0.8rem; color: #64748b; }
+    .copy-btn {
+      margin-left: auto; padding: 0.3rem 0.75rem;
+      background: #6366f1; color: white; border: none;
+      border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #4f46e5; }
+    .copy-btn.copied { background: #16a34a; }
+    pre {
+      padding: 1rem; overflow-x: auto;
+      font-family: "SF Mono", "Fira Code", monospace; font-size: 0.8rem;
+      line-height: 1.6; color: #1e293b;
+    }
+
+    /* ── Download button ───────────────────────────────────────────── */
+    .download-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.25rem; border-radius: 8px;
+      background: #0f172a; color: white; font-size: 0.85rem;
+      font-weight: 600; text-decoration: none; border: none;
+      cursor: pointer; margin-top: 0.75rem;
+    }
+    .download-btn:hover { background: #1e293b; }
+
+    /* ── Steps list ────────────────────────────────────────────────── */
+    .steps-card {
+      background: white; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+    }
+    .steps-card ol, .steps-card ul {
+      padding-left: 1.25rem;
+    }
+    .steps-card li {
+      font-size: 0.9rem; color: #334155; padding: 0.4rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .steps-card li:last-child { border-bottom: none; }
+
+    footer {
+      text-align: center; color: #94a3b8;
+      font-size: 0.75rem; padding: 2rem;
+    }
+    footer a { color: #6366f1; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ── Token gate ─────────────────────────────────────────────────────── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-logo">Cite<span>Logic</span></div>
+    <h2>Enter your access code</h2>
+    <p>Your code was included in the delivery email from CiteLogic.</p>
+    <input id="token-input" class="gate-input" type="text"
+           placeholder="e.g. a3f9c12b4d1e" autocomplete="off"
+           onkeydown="if(event.key==='Enter') checkToken()">
+    <button class="gate-btn" onclick="checkToken()">View my kit</button>
+    <div class="gate-error" id="gate-error">Incorrect code. Check your email and try again.</div>
+  </div>
+</div>
+
+<!-- ── Header ─────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">Cite<span>Logic</span></div>
+  <h1>LLMO Kit — 2Create Designs</h1>
+</header>
+
+<!-- ── Main ───────────────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">LLMO Kit Delivery</div>
+    <h2>2Create Designs</h2>
+    <p>We have completed an LLMO kit for 2Create Designs, which includes JSON-LD markup for your Organization and multiple Service offerings. This kit is designed to enhance your visibility in search results by providing structured data about your business and its offerings. The inclusion of an llms.txt file further optimizes how language models interact with your site, ensuring comprehensive recognition.</p>
+    <div class="status-row">
+      <span class="status-badge" style="background:#16a34a22; color:#16a34a">
+        <span class="dot" style="background:#16a34a"></span>
+        Audit PASS
+      </span>
+      <span class="status-badge" style="background:#16a34a22; color:#16a34a">
+        <span class="dot" style="background:#16a34a"></span>
+        Compliance PASS
+      </span>
+    </div>
+  </div>
+
+  <!-- llms.txt -->
+  <section>
+    <div class="section-title">① llms.txt — upload to your site root</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="badge">llms.txt</span>
+        <span class="code-label">Upload to https://2createdesigns.com/llms.txt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># 2Create Designs
+
+&gt; 2Create Designs offers comprehensive event design, planning, and rental services for weddings, corporate functions, and social gatherings throughout Southern California.
+
+## About
+
+Location: Anaheim
+Phone: +1-888-865-4940
+Website: https://2createdesigns.com
+
+## Core Services
+
+- Wedding Design &amp; Decor
+- Custom Floral Arrangements
+- Corporate Event Design
+- Social Event Design
+- Event Planning
+- Event Furniture &amp; Party Equipment Rentals
+</code></pre>
+    </div>
+    <button class="download-btn" onclick="downloadLlmsTxt()">
+      ↓ Download llms.txt
+    </button>
+  </section>
+
+  <!-- JSON-LD blocks -->
+  <section>
+    <div class="section-title">② JSON-LD Schema Blocks — paste into your &lt;head&gt;</div>
+    
+        <div class="code-block">
+          <div class="code-header">
+            <span class="badge">Organization</span>
+            <span class="code-label">2Create Designs</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code>&lt;script type="application/ld+json"&gt;
+{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;Organization&quot;,
+  &quot;name&quot;: &quot;2Create Designs&quot;,
+  &quot;url&quot;: &quot;https://2createdesigns.com&quot;
+}
+&lt;/script&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="badge">Service</span>
+            <span class="code-label">Wedding Design</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code>&lt;script type="application/ld+json"&gt;
+{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;Service&quot;,
+  &quot;name&quot;: &quot;Wedding Design&quot;,
+  &quot;description&quot;: &quot;2Create Designs offers wedding design services, creating unique themes and decor for celebrations across Southern California.&quot;,
+  &quot;provider&quot;: {
+    &quot;@type&quot;: &quot;LocalBusiness&quot;,
+    &quot;name&quot;: &quot;2Create Designs&quot;
+  }
+}
+&lt;/script&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="badge">Service</span>
+            <span class="code-label">Floral Design</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code>&lt;script type="application/ld+json"&gt;
+{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;Service&quot;,
+  &quot;name&quot;: &quot;Floral Design&quot;,
+  &quot;description&quot;: &quot;2Create Designs crafts custom floral arrangements, providing fresh and distinctive designs for events and occasions.&quot;,
+  &quot;provider&quot;: {
+    &quot;@type&quot;: &quot;LocalBusiness&quot;,
+    &quot;name&quot;: &quot;2Create Designs&quot;
+  }
+}
+&lt;/script&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="badge">Service</span>
+            <span class="code-label">Event Decor</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code>&lt;script type="application/ld+json"&gt;
+{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;Service&quot;,
+  &quot;name&quot;: &quot;Event Decor&quot;,
+  &quot;description&quot;: &quot;2Create Designs offers event decor, designing spaces with thematic elements, lighting, and furnishings for various events.&quot;,
+  &quot;provider&quot;: {
+    &quot;@type&quot;: &quot;LocalBusiness&quot;,
+    &quot;name&quot;: &quot;2Create Designs&quot;
+  }
+}
+&lt;/script&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="badge">Service</span>
+            <span class="code-label">Corporate Event Planning</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code>&lt;script type="application/ld+json"&gt;
+{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;Service&quot;,
+  &quot;name&quot;: &quot;Corporate Event Planning&quot;,
+  &quot;description&quot;: &quot;2Create Designs plans corporate events, organizing conferences, product launches, and professional gatherings.&quot;,
+  &quot;provider&quot;: {
+    &quot;@type&quot;: &quot;LocalBusiness&quot;,
+    &quot;name&quot;: &quot;2Create Designs&quot;
+  }
+}
+&lt;/script&gt;</code></pre>
+        </div>
+  </section>
+
+  <!-- Semantic HTML -->
+  <section>
+    <div class="section-title">③ Semantic HTML — optional upgrade to your hero section</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="badge">HTML</span>
+        <span class="code-label">Replace your existing hero / intro block</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code>&lt;div itemscope itemtype=&quot;https://schema.org/Organization&quot;&gt;
+  &lt;h1 itemprop=&quot;name&quot;&gt;2Create Designs&lt;/h1&gt;
+  &lt;p&gt;Providing comprehensive event design and planning services across Southern California.&lt;/p&gt;
+  &lt;p&gt;Contact us: &lt;span itemprop=&quot;telephone&quot;&gt;+1-888-865-4940&lt;/span&gt; | &lt;a href=&quot;https://2createdesigns.com&quot; itemprop=&quot;url&quot;&gt;2createdesigns.com&lt;/a&gt;&lt;/p&gt;
+
+  &lt;section&gt;
+    &lt;h2&gt;Our Event Services&lt;/h2&gt;
+    &lt;ul&gt;
+      &lt;li itemscope itemtype=&quot;https://schema.org/Service&quot;&gt;
+        &lt;h3 itemprop=&quot;name&quot;&gt;Wedding Design &amp;amp; Decor&lt;/h3&gt;
+        &lt;p itemprop=&quot;description&quot;&gt;Crafting unique wedding experiences with bespoke design and decor elements.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li itemscope itemtype=&quot;https://schema.org/Service&quot;&gt;
+        &lt;h3 itemprop=&quot;name&quot;&gt;Custom Floral Arrangements&lt;/h3&gt;
+        &lt;p itemprop=&quot;description&quot;&gt;Designing fresh and distinctive floral creations for every event type.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li itemscope itemtype=&quot;https://schema.org/Service&quot;&gt;
+        &lt;h3 itemprop=&quot;name&quot;&gt;Corporate Event Design&lt;/h3&gt;
+        &lt;p itemprop=&quot;description&quot;&gt;Planning and executing professional and engaging corporate events, including conferences and product launches.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li itemscope itemtype=&quot;https://schema.org/Service&quot;&gt;
+        &lt;h3 itemprop=&quot;name&quot;&gt;Social Event Design&lt;/h3&gt;
+        &lt;p itemprop=&quot;description&quot;&gt;Creating memorable designs for parties and social gatherings, ensuring every detail is considered.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li itemscope itemtype=&quot;https://schema.org/Service&quot;&gt;
+        &lt;h3 itemprop=&quot;name&quot;&gt;Event Planning&lt;/h3&gt;
+        &lt;p itemprop=&quot;description&quot;&gt;Comprehensive event planning services, managing logistics and coordination for seamless execution.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li itemscope itemtype=&quot;https://schema.org/Service&quot;&gt;
+        &lt;h3 itemprop=&quot;name&quot;&gt;Event Furniture &amp;amp; Party Equipment Rentals&lt;/h3&gt;
+        &lt;p itemprop=&quot;description&quot;&gt;Offering a selection of high-quality furniture and equipment to enhance any event space.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+
+  &lt;section&gt;
+    &lt;h2&gt;Service Areas&lt;/h2&gt;
+    &lt;p&gt;We proudly serve the following regions in Southern California:&lt;/p&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Anaheim&lt;/li&gt;
+      &lt;li&gt;Orange County, California&lt;/li&gt;
+      &lt;li&gt;Irvine&lt;/li&gt;
+      &lt;li&gt;Newport Beach&lt;/li&gt;
+      &lt;li&gt;Dana Point&lt;/li&gt;
+      &lt;li&gt;Laguna Niguel&lt;/li&gt;
+      &lt;li&gt;Huntington Beach&lt;/li&gt;
+      &lt;li&gt;Long Beach&lt;/li&gt;
+      &lt;li&gt;Los Angeles&lt;/li&gt;
+      &lt;li&gt;Los Angeles County, California&lt;/li&gt;
+      &lt;li&gt;San Diego&lt;/li&gt;
+      &lt;li&gt;Palm Springs&lt;/li&gt;
+      &lt;li&gt;Santa Barbara&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/section&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- CMS guide -->
+  <section>
+    <div class="section-title">④ Implementation guide</div>
+    <div class="steps-card">
+      <ol><li>Locate your site&#x27;s main template or header file</li>
+<li>Paste each JSON-LD script block just before the closing &lt;/head&gt; tag</li>
+<li>Save and publish</li>
+<li>Check your page source (Ctrl+U) for existing application/ld+json script tags and remove any conflicting LocalBusiness or Organization schema before adding the new ones</li></ol>
+    </div>
+  </section>
+
+  <!-- Next steps -->
+  <section>
+    <div class="section-title">⑤ Your next steps</div>
+    <div class="steps-card">
+      <ul><li>Access the generated kit JSON from the provided URL.</li>
+<li>Implement the JSON-LD markup on the relevant pages of 2createdesigns.com, specifically for the Organization and Service entities.</li>
+<li>Upload the llms.txt file to the root directory of 2createdesigns.com.</li>
+<li>Verify the structured data implementation using Google&#x27;s Rich Results Test tool.</li>
+<li>Monitor your website&#x27;s performance and structured data status in Google Search Console.</li></ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Generated by <a href="https://citelogic.io">CiteLogic</a> · 2Create Designs ·
+  Questions? Reply to your delivery email.
+</footer>
+
+<script>
+  // ── Token data (Phase 1: client-side only) ────────────────────────────
+  const VALID_TOKEN = "63a9578b9d63";
+
+  function checkToken() {
+    const input = document.getElementById("token-input").value.trim().toLowerCase();
+    if (input === VALID_TOKEN) {
+      document.getElementById("gate").classList.add("hidden");
+      sessionStorage.setItem("cl_token_2create-designs", "1");
+    } else {
+      document.getElementById("gate-error").style.display = "block";
+      document.getElementById("token-input").style.borderColor = "#ef4444";
+    }
+  }
+
+  // Auto-admit if token is in URL or already passed this session
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = (params.get("token") || "").toLowerCase();
+    const session  = sessionStorage.getItem("cl_token_2create-designs");
+    if (urlToken === VALID_TOKEN || session === "1") {
+      document.getElementById("gate").classList.add("hidden");
+    }
+  })();
+
+  // ── Copy-to-clipboard ─────────────────────────────────────────────────
+  function copyCode(btn) {
+    const pre = btn.closest(".code-block").querySelector("pre code");
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = "Copied!";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+    });
+  }
+
+  // ── Download llms.txt ─────────────────────────────────────────────────
+  function downloadLlmsTxt() {
+    const content = document.querySelector("#gate ~ header ~ main section pre code").innerText;
+    const blob = new Blob([content], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "llms.txt";
+    a.click();
+  }
+</script>
+</body>
+</html>
